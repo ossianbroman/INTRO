@@ -115,8 +115,8 @@ team.clean.data <-  team.data %>%
                                           TRUE ~ NA_character_ ),
                       
                       newY_Groupedwt = case_when( wt <= 108.5 ~ 1,
-                                                  number <= 120  ~ 2,
-                                                  number <= 131 ~ 3,
+                                                  wt <= 120  ~ 2,
+                                                  wt <= 131 ~ 3,
                                                   # 98 is unknown, 99 not asked ~ same thing?
                                                   TRUE ~ 4 ),
                                   
