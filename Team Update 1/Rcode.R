@@ -166,42 +166,54 @@ p.model.data <- base.model.dataset
 p.model <- lm(wt ~ ., data = p.model.data)
 Anova(p.model)
 
-new.p.Model.1 <- update(p.model, . ~ . -dage)
+#Remove the coliniar covariantes
+new.p.Model.1 <- update(p.model, . ~ . -mtime)
 Anova(new.p.Model.1)
 
-new.p.Model.2 <- update(new.p.Model.1, . ~ . -mage)
+new.p.Model.2 <- update(new.p.Model.1, . ~ . -msmoke)
 Anova(new.p.Model.2)
+# Now continue
 
-new.p.Model.3 <- update(new.p.Model.2, . ~ . -marital)
+new.p.Model.3 <- update(new.p.Model.2, . ~ . -dage)
 Anova(new.p.Model.3)
 
-new.p.Model.4 <- update(new.p.Model.3, . ~ . -inc)
+new.p.Model.4 <- update(new.p.Model.3, . ~ . -mage)
 Anova(new.p.Model.4)
 
-new.p.Model.5 <- update(new.p.Model.4, . ~ . -dht)
+new.p.Model.5 <- update(new.p.Model.4, . ~ . -marital)
 Anova(new.p.Model.5)
 
-new.p.Model.6 <- update(new.p.Model.5, . ~ . -med)
+new.p.Model.6 <- update(new.p.Model.5, . ~ . -inc)
 Anova(new.p.Model.6)
 
-new.p.Model.7 <- update(new.p.Model.6, . ~ . -mwt)
-Anova(new.p.Model.7)
+new.p.Model.7 <- update(new.p.Model.6, . ~ . -dht)
+Anova(new.p.Model.5)
 
-new.p.Model.8 <- update(new.p.Model.7, . ~ . -mrace)
+new.p.Model.8 <- update(new.p.Model.7, . ~ . -med)
 Anova(new.p.Model.8)
 
-new.p.Model.9 <- update(new.p.Model.8, . ~ . -ded)
+new.p.Model.9 <- update(new.p.Model.8, . ~ . -mwt)
 Anova(new.p.Model.9)
 
-#Remove the coliniar covariantes
-new.p.Model.10 <- update(new.p.Model.9, . ~ . -mtime)
-Anova(new.p.Model.10)
+new.p.Model.10 <- update(new.p.Model.9, . ~ . -mrace)
+Anova(new.p.Model.8)
 
-new.p.Model.11 <- update(new.p.Model.10, . ~ . -msmoke)
+new.p.Model.11 <- update(new.p.Model.10, . ~ . -date)
 Anova(new.p.Model.11)
+
+new.p.Model.12 <- update(new.p.Model.11, . ~ . -ded)
+Anova(new.p.Model.12)
+
+new.p.Model.13 <- update(new.p.Model.12, . ~ . -dwt)
+Anova(new.p.Model.13)
+
+# Date is not considered to be of interest as a covariate and is therefore removed
+
+
+
 # We now have a model following the p-value method which contains the 
-    # gestation, mparity, mht, drace,, ded, dwt, mtime, mnumber
-p.value.model <- lm(wt ~ gestation + mparity + mht + drace  + dwt + mnumber, data = lmModel.1)
+# gestation, mparity, mht, drace,, ded, dwt, mtime, mnumber
+p.value.model <- lm(wt ~ gestation + mparity + mht + drace  +  mnumber, data = lmModel.1)
 summary(p.value.model)
 plot(p.value.model)
 AIC(p.value.model)
