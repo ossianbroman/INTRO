@@ -127,8 +127,8 @@ team.clean.data <-  team.data %>%
                       # lowe birth weight references;
                       # https://www.verywellfamily.com/baby-birth-weight-statistics-2633630
                       # https://www.babycentre.co.uk/a1033196/low-birth-weight-in-babies
-                      lowBirthWeight = case_when( wt <= 88 ~ 1,
-                                                  TRUE ~ 0 )
+                      lowBirthWeight = case_when( wt <= 88 ~ 'Yes',
+                                                  TRUE ~ 'No' )
                           ) %>%
                     # add m prefix to all columns associated with 'Mother' to clarify 
                     rename( 'mparity' = parity, 'mage' = age, 'mwt' = wt.1, 
@@ -151,6 +151,72 @@ team.clean.data[ unknown99 ] [ team.clean.data[ unknown99 ] == 99 ] <- NA
 # view cleaned resulting data set
 #View( team.clean.data )
 #str( team.clean.data )
+
+# *
+# * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# * Data Exploration Section
+
+# *
+# * Initial table summary of Low Birth Weight & baby weight differentials
+# *
+table.LowBirthWeights <-  team.clean.data %>%
+                          count( lowBirthWeight ) %>%
+                          ungroup() %>% 
+                          mutate( prop = round( prop.table( n ), digits = 2 ) )  %>% 
+                          bind_rows( group_by(.) %>%
+                                      summarise( n = sum( n ), prop = sum( prop ) ) %>%
+                                      mutate( lowBirthWeight ='Total' ) ) %>%  
+                          rename( 'Low Birth Weight' = lowBirthWeight,
+                                  'Number of Observations' = n,
+                                  'Proportion of Data Set (%)' = prop )
+
+# check out table
+kable( table.LowBirthWeights )
+
+# lets have a look at the differentials of baby weights, coloured by low birth weight column
+hist.babyWeights <- ggplot( data = team.clean.data,
+                            aes( x = wt, fill = lowBirthWeight ) ) +
+                    geom_bar() +
+                    ggtitle('Distribution of Baby Weights') +
+                    xlab('Range of Baby Weights') +
+                    ylab('Count of differences observed') +
+                    theme_light()
+
+# check out chart
+hist.babyWeights
+
+# *
+# * Collinearity between msmoke & mtime 
+# *
+# show strange relationship between mSmoke & mTime
+# make copy data set to help plot results
+chart.msmoketime <- team.clean.data
+
+# something to possibly consider
+chart.msmoketime <- chart.msmoketime[ !is.na(chart.msmoketime$msmoke), ]
+chart.msmoketime <- chart.msmoketime[ !is.na(chart.msmoketime$mtime), ]
+
+# strange relationship occurs when mTime equals 'During current pregnancy'
+highlight.gene <- 'During current pregnancy'
+# add highlight flag to new data set
+chart.msmoketime$highlight <- ifelse( chart.msmoketime$mtime == highlight.gene, 'Ambiguity Identified', 'Clear Meaning')
+
+textdf <- chart.msmoketime[chart.msmoketime$mtime == highlight.gene, ]
+mycolours <- c( 'Ambiguity Identified' = 'red', 'Clear Meaning' = 'grey50')
+
+# make final scatter plot
+scPlot.mSmokemTime <- ggplot( data = chart.msmoketime, 
+                              aes( x = msmoke, y = mtime ) ) +
+                      geom_point( size = 3, 
+                                  aes( colour = highlight ) ) +
+                      scale_color_manual( 'Colour Key:', values = mycolours ) +
+                      ggtitle( 'Relationship between mSmoke and mTime variables in data set' ) +
+                      xlab( 'Mothers Smoking Status' ) +
+                      ylab( 'If the Mother quit smokng, how long ago' ) +
+                      theme( legend.position = 'none' ) +
+                      theme_light()
+# check out chart
+scPlot.mSmokemTime
 
 
 # *
