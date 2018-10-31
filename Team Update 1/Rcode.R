@@ -366,7 +366,12 @@ table(cut.fit)
 library(GGally) 
 numericonly <- base.model.dataset %>% select_if(is.numeric)
 ggpairs(numericonly)
-
+# Running summary
+summary(model3.lm.final)
+Anova(model3.lm.final) 
+confint(model3.lm.final)
+plot(confint(model3.lm.final))
+# demonstrating the confidence intervals graphically 
 # demonstrating the confidence intervals graphically 
 library(effects)
 effect.model <- base.model.dataset %>% 
@@ -374,7 +379,7 @@ effect.model <- base.model.dataset %>%
          drace= factor(drace), mnumber= factor(mnumber), mht= factor(mht),
          dwt = factor(dwt)) 
 
-altered.model <- update(model3.lm.final), .~.,data = effect.model)
+altered.model <- update(model3.lm.final, wt ~. , data = effect.model)
 plot(effect(term = "drace", mod = altered.model))
 plot(effect(term = "mnumber", mod = altered.model))
 plot(effect(term = "mparity", mod = altered.model))
