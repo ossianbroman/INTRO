@@ -260,3 +260,124 @@ AIC( model3.final )
 
 
 # FARZAM - to put in assumtions code and bootstrap
+# check model for collinearity - proves atleast one exists
+vif( model3.AICStep )
+# confirm which variables are collinear - mtime and mnumber
+alias( model3.AICStep )
+
+# however, from our data exploration we know something is up with msmoke & mtime
+# so lets apply the same approach as above, but force the step() function to disregard 
+# mtime - easiest way to do that is to remove mtime from the data set provided
+# try another model removing mtime from dataset
+base.model.dataset.without.mtime <- base.model.dataset %>% 
+                                    select( -mtime )
+model3.lm.AICStep.without.mtime <- lm( wt ~ ., data = base.model.dataset.without.mtime )
+# calculate new best model, and what do we have here... AIC is now 3294.08 - lower than our previous best!...
+model3.AICStep.without.mtime <- step( model3.lm.AICStep.without.mtime )
+
+# so lets confirm that we achieve the same AIC result by selecting the specific predictive variables
+# test model without time on data set including mtime
+model3.lm.comparisonStuff <- lm( wt ~ mnumber + dwt + mparity + msmoke + drace + mht + gestation, data = base.model.dataset ) 
+# we do, so our actual best model is this one - not the above
+model3.comparisonStuff <- step( model3.lm.comparisonStuff )
+
+# now check for collinearity - proves atleast one exists
+vif( model3.lm.comparisonStuff )
+# confirm which variables are collinear - mnumber and msmoke
+alias( model3.lm.comparisonStuff )
+
+# There are aliased coefs ranning into perfect collinearity 
+# Indentifying which linearly dependent variables are culprits
+ld.variables <- attributes(alias(model3.lm.comparisonStuff)$Complete)$dimnames[[1]]
+
+# therefor our final best model for AIC stepwise approach is below
+model3.lm.final <- lm( wt ~ mnumber + dwt + mparity + drace + mht + gestation, data = base.model.dataset ) 
+model3.final <- step( model3.lm.final )
+
+# Returnining an AIC value of 5003.591
+AIC( model3.final )
+# Evaluate Collinearity using variance inflation factors 
+vif(model3.lm.final)
+alias(model3.lm.final)
+
+# Model diagnostics: collinearity
+# Examining this using Variance Inﬂation Factors (VIFs)
+# Measurinng the instability of parameter estimates due to dependencies between covariates 
+# They are non-negative and a rule of thumb is that VIFs >10 is problematic 
+vif(model3.lm.final) > 10
+
+# Model diagnostics - error distribution
+# Once all the signal is eliminated, only iid Normal distributed remain. Shape • 
+# Checking shape of errors by the distribution of residuals (yi −ˆ yi) • 
+# Using QQ-Norm plots and tests of Normality (Shapiro-Wilks, H0 the data (errors) are Normally distributed)
+# Model diagnostics - error shape
+qqnorm(resid(model3.lm.final)) 
+qqline(resid(model3.lm.final))
+shapiro.test(resid(model3.lm.final))
+
+# Trying to track down the extreme residuals 
+hist(resid(model3.lm.final))
+High.Resid <- which(abs(resid(model3.lm.final))>5) 
+base.model.dataset[High.Resid,]
+
+# Evaluate Nonlinearity
+# component + residual plot 
+crPlots(model3.lm.final)
+# Showing Ceres plots 
+ceresPlots(model3.lm.final)
+
+# Assessing linearity 
+library(Epi)
+par(mfrow=c(3,2))
+termplot(model3.lm.final, se=T)
+termplot(model3.lm.final, se=T, partial.resid = T)
+
+# Spread: 
+# Checking variance of residuals (variance of the error distribution) is constant WRT ˆ y and the x 
+# Testing with Breusch-Pagan (H0 the errors are homoscedastic/have constant variance)
+ncvTest(model3.lm.final)
+# Plots residuals against ˆ y and the x
+Model.Resid <- resid(model3.lm.final)
+par(mfrow=c(3,2))
+plot(base.model.dataset$wt, Model.Resid, ylab = 'residuals', xlab = 'Mother Weight')
+plot(base.model.dataset$mage, Model.Resid, ylab = 'residuals', xlab = 'Mother Age')
+plot(fitted(model3.lm.final), Model.Resid, ylab = 'residuals', xlab = 'Fitted values')
+
+# plotting studentized residuals vs. fitted values 
+spreadLevelPlot(model3.lm.final)
+
+# One can be explicit about which covariate to test against: 
+ncvTest(model3.lm.final, wt ~ .)
+
+# Independence: 
+# Checking serial correlation of residuals, when ordered in some logical way e.g. order of collection, ˆ y, or an x 
+# Plots residuals against ˆ y and the x 
+# Testing with Durbin-Watson (H0 the errors are uncorrelated)
+durbinWatsonTest(model3.lm.final)
+Graph_1 <- plot(model3.lm.final, Model.Resid, ylab = 'residuals', xlab = 'Baby Weight')
+Graph_2 <- plot(model3.lm.final, which = 1:2)
+
+cut.fit <- cut(fitted(model3.lm.final), breaks = quantile(fitted(model3.lm.final),
+                                                        probs = c(seq(0,1,length=20))))
+
+table(cut.fit)
+
+# plotting paris covariates
+library(GGally) 
+numericonly <- base.model.dataset %>% select_if(is.numeric)
+ggpairs(numericonly)
+
+# demonstrating the confidence intervals graphically 
+library(effects)
+effect.model <- base.model.dataset %>% 
+  mutate(gestation= factor(gestation), mparity = factor(mparity), 
+         drace= factor(drace), mnumber= factor(mnumber), mht= factor(mht),
+         dwt = factor(dwt)) 
+
+altered.model <- update(model3.lm.final), .~.,data = effect.model)
+plot(effect(term = "drace", mod = altered.model))
+plot(effect(term = "mnumber", mod = altered.model))
+plot(effect(term = "mparity", mod = altered.model))
+plot(effect(term = "dwt", mod = altered.model))
+plot(effect(term = "gestation", mod = altered.model))
+plot(effect(term = "mht", mod = altered.model))
