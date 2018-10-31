@@ -1,26 +1,164 @@
 
-# AIC section -------------------------------------------------------------
-
-# SAM - to put in his funciton and data cleaning
-
-
-# AIC step
-library(car)
-
-lmModel.1 <- team.clean.data %>% na.omit() %>% select(-sex, -id, -outcome, -pluralty, -date)
-fullModel.1 <- lm(wt ~ ., data = lmModel.1)
-step(fullModel.1)
-#AIC of 3299.5 is the mbst model according to step() with mnumber, dwt, mtime, mparity, drace, mht, and gestation 
-test.2 <- lm(wt ~ mnumber + dwt  + as.factor(mparity) + drace + mht + gestation , data = lmModel.1)
-test.3 <- lm(wt ~ mnumber + dwt  + mparity + drace + mht + gestation , data = lmModel.1)
-
-summary(test.2)
-plot(test.2)
-AIC(test.2, test.3, p.value.model)
+# load required libraries
+library( 'dplyr' )
+library( 'knitr' )
+library( 'ggplot2' )
+library( 'car' )
 
 
-wt <- team.clean.data$wt
-summary(wt)
+# need to change this to one of our ID's...
+# ensures when we take a random 80% sample for training and 20% for testing 
+# of model that we get the same results
+set.seed(123)
+#set.seed(99999)
+
+# options for setting directories
+setwd("D:/sbr_Development/MSc/Semester 1/MT5762/Assignments/#2")	
+
+
+# load data into R
+team.data <- read.table('babies23.data', header=TRUE)
+#write.csv( my.data, 'quickLookie.csv' )
+#View( team.data )
+
+# add naming conventions to columns to replace numeric counterparts
+# here we'll also take the opportunity to generalise all unknowns to NA...
+# we can later show those as 'Unknown' if we wish - at this stage however just
+# keeps things a little cleaner
+team.clean.data <-  team.data %>%
+                    mutate( 
+                      sex = case_when( sex == 1 ~ 'Male',
+                                       sex == 2 ~ 'Female',
+                                       TRUE ~ NA_character_ ),
+                      
+                      race = case_when( race %in% 0:5 ~ 'White',
+                                        race == 6 ~ 'Mex', 
+                                        race == 7 ~ 'Black',
+                                        race == 8 ~ 'Asian',
+                                        race == 9 ~ 'Mixed',
+                                        TRUE ~ NA_character_ ),
+
+                      ed = case_when( ed == 0 ~ 'Less than 8th Grade',
+                                      ed == 1 ~ '8th - 12th Grade - did not graduate',
+                                      ed == 2 ~ 'HS graduate - no other schooling',
+                                      ed == 3 ~ 'HS + trade',
+                                      ed == 4 ~ 'HS + some College',
+                                      ed == 5 ~ 'College graduate',
+                                      ed %in% 6:7  ~ 'Trade school HS unclear',
+                                      TRUE ~ NA_character_ ),
+                      
+                      drace = case_when(  drace %in% 0:5 ~ 'White',
+                                          drace == 6 ~ 'Mex', 
+                                          drace == 7 ~ 'Black',
+                                          drace == 8 ~ 'Asian',
+                                          drace == 9 ~ 'Mixed',
+                                          TRUE ~ NA_character_ ),
+                
+                      ded = case_when(  ded == 0 ~ 'Less than 8th Grade',
+                                        ded == 1 ~ '8th - 12th Grade - did not graduate',
+                                        ded == 2 ~ 'HS graduate - no other schooling',
+                                        ded == 3 ~ 'HS + trade',
+                                        ded == 4 ~ 'HS + some College',
+                                        ded == 5 ~ 'College graduate',
+                                        ded %in% 6:7  ~ 'Trade school HS unclear',
+                                        TRUE ~ NA_character_ ),
+                      
+                      marital = case_when(  marital == 1 ~ 'Married',
+                                            marital == 2 ~ 'Legally Separated', 
+                                            marital == 3 ~ 'Divorced',
+                                            marital == 4 ~ 'Widowed',
+                                            marital == 5 ~ 'Never Married',
+                                          TRUE ~ NA_character_ ),
+                      
+                      inc = case_when(  inc == 1 ~ 'Under 2500',
+                                        inc == 2 ~ '2500 - 4999', 
+                                        inc == 3 ~ '5000 - 7499',
+                                        inc == 4 ~ '7500 - 9999',
+                                        inc == 5 ~ '10000 - 12499', 
+                                        inc == 6 ~ '12500 - 14999',
+                                        inc == 7 ~ '15000 - 17499',
+                                        inc == 8 ~ '17500 - 19999', 
+                                        inc == 9 ~ '20000 and over',
+                                        # 98 is unknown, 99 not asked ~ same thing?
+                                        TRUE ~ NA_character_ ),
+                      
+                      smoke = case_when(  smoke == 0 ~ 'Never',
+                                          smoke == 1 ~ 'Smokes now', 
+                                          smoke == 2 ~ 'Until current pregnancy',
+                                          smoke == 3 ~ 'Once did, not now',
+                                          TRUE ~ NA_character_ ),
+                      
+                      time = case_when( time == 0 ~ 'Never smoked',
+                                        time == 1 ~ 'Still smokes',
+                                        time == 2 ~ 'During current pregnancy', 
+                                        time == 3 ~ 'Within 1 year',
+                                        time == 4 ~ '1 to 2 years ago',
+                                        time == 5 ~ '2 to 3 years ago', 
+                                        time == 6 ~ '3 to 4 years ago',
+                                        time == 7 ~ '5 to 9 years ago',
+                                        time == 8 ~ '10+ years ago', 
+                                        time == 9 ~ 'Quit and dont know',
+                                        # 98 is unknown, 99 not asked ~ same thing?
+                                        TRUE ~ NA_character_ ),
+                      
+                      number = case_when( number == 0 ~ 'Never',
+                                          number == 1 ~ '1-4',
+                                          number == 2 ~ '5-9', 
+                                          number == 3 ~ '10-14',
+                                          number == 4 ~ '15-19',
+                                          number == 5 ~ '20-29', 
+                                          number == 6 ~ '30-39',
+                                          number == 7 ~ '40-60',
+                                          number == 8 ~ '60+', 
+                                          number == 9 ~ 'Smoke but dont know',
+                                          # 98 is unknown, 99 not asked ~ same thing?
+                                          TRUE ~ NA_character_ ),
+                      
+                      newY_Groupedwt = case_when( wt <= 108.5 ~ 1,
+                                                  number <= 120  ~ 2,
+                                                  number <= 131 ~ 3,
+                                                  # 98 is unknown, 99 not asked ~ same thing?
+                                                  TRUE ~ 4 ),
+                                  
+                      # lowe birth weight references;
+                      # https://www.verywellfamily.com/baby-birth-weight-statistics-2633630
+                      # https://www.babycentre.co.uk/a1033196/low-birth-weight-in-babies
+                      lowBirthWeight = case_when( wt <= 88 ~ 1,
+                                                  TRUE ~ 0 )
+                          ) %>%
+                    # add m prefix to all columns associated with 'Mother' to clarify 
+                    rename( 'mparity' = parity, 'mage' = age, 'mwt' = wt.1, 
+                            'mht' = ht, 'mrace' = race, 'med' = ed, 
+                            'msmoke' = smoke, 'mtime' = time, 'mnumber' = number ) %>%
+  
+                    # remove msmoke due to collinearity with mtimes & mnumber
+                    # in addition we can remove other unrequired columns 
+                    select( -sex, -id, -pluralty, -outcome )
+
+
+# generalise all 999 unknown's to NA
+unknown999 <- c( 'gestation', 'wt', 'mage', 'mwt', 'dage', 'dwt' )
+team.clean.data[ unknown999 ] [ team.clean.data[ unknown999 ] == 999 ] <- NA
+
+# generalise all 99 unknown's to NA
+unknown99 <- c( 'mparity', 'mht', 'dht' )
+team.clean.data[ unknown99 ] [ team.clean.data[ unknown99 ] == 99 ] <- NA
+
+# view cleaned resulting data set
+#View( team.clean.data )
+#str( team.clean.data )
+
+
+# *
+# * BASE DATA SET FOR MODELLING 
+# *
+base.model.dataset <- team.clean.data %>% 
+                      select( -newY_Groupedwt, -lowBirthWeight ) %>% 
+                      na.omit() 
+
+
+
+# *
 
 #  backwards p-value method  -------------------------------------------------
 
@@ -67,5 +205,46 @@ p.value.model <- lm(wt ~ gestation + mparity + mht + drace  + dwt + mnumber, dat
 summary(p.value.model)
 plot(p.value.model)
 AIC(p.value.model)
+
+# * INITIAL MODEL SELECTION ~ AIC Stepwise 
+# *
+# with our base model dataset
+model3.lm.AICStep <- lm( wt ~ ., data = base.model.dataset )
+model3.AICStep <- step( model3.lm.AICStep )
+# check model for collinearity - proves atleast one exists
+vif( model3.AICStep )
+# confirm which variables are collinear - mtime and mnumber
+alias( model3.AICStep )
+
+# however, from our data exploration we know something is up with msmoke & mtime
+# so lets apply the same approach as above, but force the step() function to disregard 
+# mtime - easiest way to do that is to remove mtime from the data set provided
+# try another model removing mtime from dataset
+base.model.dataset.without.mtime <- base.model.dataset %>% 
+                                    select( -mtime )
+model3.lm.AICStep.without.mtime <- lm( wt ~ ., data = base.model.dataset.without.mtime )
+# calculate new best model, and what do we have here... AIC is now 3294.08 - lower than our previous best!...
+model3.AICStep.without.mtime <- step( model3.lm.AICStep.without.mtime )
+
+# so lets confirm that we achieve the same AIC result by selecting the specific predictive variables
+# test model without time on data set including mtime
+model3.lm.comparisonStuff <- lm( wt ~ mnumber + dwt + mparity + msmoke + drace + mht + gestation, data = base.model.dataset ) 
+# we do, so our actual best model is this one - not the above
+model3.comparisonStuff <- step( model3.lm.comparisonStuff )
+
+# now check for collinearity - proves atleast one exists
+vif( model3.lm.comparisonStuff )
+# confirm which variables are collinear - mnumber and msmoke
+alias( model3.lm.comparisonStuff )
+
+
+# therefor our final best model for AIC stepwise approach is below
+model3.lm.final <- lm( wt ~ mnumber + dwt + mparity + drace + mht + gestation, data = base.model.dataset ) 
+model3.final <- step( model3.lm.final )
+
+# returnining an AIC value of 5003.591
+AIC( model3.final )
+
+
 
 # FARZAM - to put in assumtions code and bootstrap
