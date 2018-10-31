@@ -162,7 +162,7 @@ base.model.dataset <- team.clean.data %>%
 
 #  backwards p-value method  -------------------------------------------------
 
-p.model.data <- team.clean.data %>% na.omit() %>% select(-sex, -id, -outcome, -pluralty, -date)
+p.model.data <- base.model.dataset
 p.model <- lm(wt ~ ., data = p.model.data)
 Anova(p.model)
 
