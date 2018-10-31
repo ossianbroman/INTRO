@@ -428,4 +428,32 @@ plot(First.order.interaction5)
 ggplot(data = base.model.dataset) + geom_point(aes(x = mnumber, y = wt), pch = 21, size = 4, 
                                                fill = 'darkorange')
 Plot.mnumber <- ggplot(base.model.dataset) + geom_boxplot(aes(mnumber, wt), fill = 'purple', alpha = 0.8)
+# Subject our best model to bootsrapping 
+library(boot)
+set.seed(180029290)
+# something to store lots of regression coefficients 
+bootResults <- array(dim=c(1000, 17))
+for(i in 1:1000){
+# resample our data with replacement 
+regData <- data.frame(base.model.dataset)
+N <- nrow(regData)
+bootData <- regData[sample(1:N, size = N, replace = T),]
+# fit the model under this alternative reality 
+bootLM <- lm(formula = wt ~ gestation + mparity + mht + drace + dwt + mnumber, data = bootData)
+# store the coefs 
+#bootResults[i,] <- coef(bootLM)
+# store the coefs
+if(i == 1){
+  bootResults <- matrix(coef(bootLM), ncol = 17)
+} else {
+  bootResults <- rbind(bootResults, matrix(coef(bootLM), ncol = 17))
+}
 
+} 
+hist(bootResults[,1], col = "slateblue4", main = 'intercept distribution')
+hist(bootResults[,2:17], col = "slateblue4", main = 'slope distribution')
+
+# Best guesses of parameters 
+c(mean(bootResults[,1]), mean(bootResults[,2])) 
+# the CIs for these 
+rbind(quantile(bootResults[,1], probs = c(0.025, 0.975)), quantile(bootResults[,2], probs = c(0.025, 0.975)))
