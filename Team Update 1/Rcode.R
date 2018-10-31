@@ -30,114 +30,114 @@ team.data <- read.table('babies23.data', header=TRUE)
 # we can later show those as 'Unknown' if we wish - at this stage however just
 # keeps things a little cleaner
 team.clean.data <-  team.data %>%
-                    mutate( 
-                      sex = case_when( sex == 1 ~ 'Male',
-                                       sex == 2 ~ 'Female',
-                                       TRUE ~ NA_character_ ),
-                      
-                      race = case_when( race %in% 0:5 ~ 'White',
-                                        race == 6 ~ 'Mex', 
-                                        race == 7 ~ 'Black',
-                                        race == 8 ~ 'Asian',
-                                        race == 9 ~ 'Mixed',
-                                        TRUE ~ NA_character_ ),
-
-                      ed = case_when( ed == 0 ~ 'Less than 8th Grade',
-                                      ed == 1 ~ '8th - 12th Grade - did not graduate',
-                                      ed == 2 ~ 'HS graduate - no other schooling',
-                                      ed == 3 ~ 'HS + trade',
-                                      ed == 4 ~ 'HS + some College',
-                                      ed == 5 ~ 'College graduate',
-                                      ed %in% 6:7  ~ 'Trade school HS unclear',
-                                      TRUE ~ NA_character_ ),
-                      
-                      drace = case_when(  drace %in% 0:5 ~ 'White',
-                                          drace == 6 ~ 'Mex', 
-                                          drace == 7 ~ 'Black',
-                                          drace == 8 ~ 'Asian',
-                                          drace == 9 ~ 'Mixed',
-                                          TRUE ~ NA_character_ ),
-                
-                      ded = case_when(  ded == 0 ~ 'Less than 8th Grade',
-                                        ded == 1 ~ '8th - 12th Grade - did not graduate',
-                                        ded == 2 ~ 'HS graduate - no other schooling',
-                                        ded == 3 ~ 'HS + trade',
-                                        ded == 4 ~ 'HS + some College',
-                                        ded == 5 ~ 'College graduate',
-                                        ded %in% 6:7  ~ 'Trade school HS unclear',
-                                        TRUE ~ NA_character_ ),
-                      
-                      marital = case_when(  marital == 1 ~ 'Married',
-                                            marital == 2 ~ 'Legally Separated', 
-                                            marital == 3 ~ 'Divorced',
-                                            marital == 4 ~ 'Widowed',
-                                            marital == 5 ~ 'Never Married',
-                                          TRUE ~ NA_character_ ),
-                      
-                      inc = case_when(  inc == 1 ~ 'Under 2500',
-                                        inc == 2 ~ '2500 - 4999', 
-                                        inc == 3 ~ '5000 - 7499',
-                                        inc == 4 ~ '7500 - 9999',
-                                        inc == 5 ~ '10000 - 12499', 
-                                        inc == 6 ~ '12500 - 14999',
-                                        inc == 7 ~ '15000 - 17499',
-                                        inc == 8 ~ '17500 - 19999', 
-                                        inc == 9 ~ '20000 and over',
-                                        # 98 is unknown, 99 not asked ~ same thing?
-                                        TRUE ~ NA_character_ ),
-                      
-                      smoke = case_when(  smoke == 0 ~ 'Never',
-                                          smoke == 1 ~ 'Smokes now', 
-                                          smoke == 2 ~ 'Until current pregnancy',
-                                          smoke == 3 ~ 'Once did, not now',
-                                          TRUE ~ NA_character_ ),
-                      
-                      time = case_when( time == 0 ~ 'Never smoked',
-                                        time == 1 ~ 'Still smokes',
-                                        time == 2 ~ 'During current pregnancy', 
-                                        time == 3 ~ 'Within 1 year',
-                                        time == 4 ~ '1 to 2 years ago',
-                                        time == 5 ~ '2 to 3 years ago', 
-                                        time == 6 ~ '3 to 4 years ago',
-                                        time == 7 ~ '5 to 9 years ago',
-                                        time == 8 ~ '10+ years ago', 
-                                        time == 9 ~ 'Quit and dont know',
-                                        # 98 is unknown, 99 not asked ~ same thing?
-                                        TRUE ~ NA_character_ ),
-                      
-                      number = case_when( number == 0 ~ 'Never',
-                                          number == 1 ~ '1-4',
-                                          number == 2 ~ '5-9', 
-                                          number == 3 ~ '10-14',
-                                          number == 4 ~ '15-19',
-                                          number == 5 ~ '20-29', 
-                                          number == 6 ~ '30-39',
-                                          number == 7 ~ '40-60',
-                                          number == 8 ~ '60+', 
-                                          number == 9 ~ 'Smoke but dont know',
-                                          # 98 is unknown, 99 not asked ~ same thing?
-                                          TRUE ~ NA_character_ ),
-                      
-                      newY_Groupedwt = case_when( wt <= 108.5 ~ 1,
-                                                  wt <= 120  ~ 2,
-                                                  wt <= 131 ~ 3,
-                                                  # 98 is unknown, 99 not asked ~ same thing?
-                                                  TRUE ~ 4 ),
-                                  
-                      # lowe birth weight references;
-                      # https://www.verywellfamily.com/baby-birth-weight-statistics-2633630
-                      # https://www.babycentre.co.uk/a1033196/low-birth-weight-in-babies
-                      lowBirthWeight = case_when( wt <= 88 ~ 'Yes',
-                                                  TRUE ~ 'No' )
-                          ) %>%
-                    # add m prefix to all columns associated with 'Mother' to clarify 
-                    rename( 'mparity' = parity, 'mage' = age, 'mwt' = wt.1, 
-                            'mht' = ht, 'mrace' = race, 'med' = ed, 
-                            'msmoke' = smoke, 'mtime' = time, 'mnumber' = number ) %>%
+  mutate( 
+    sex = case_when( sex == 1 ~ 'Male',
+                     sex == 2 ~ 'Female',
+                     TRUE ~ NA_character_ ),
+    
+    race = case_when( race %in% 0:5 ~ 'White',
+                      race == 6 ~ 'Mex', 
+                      race == 7 ~ 'Black',
+                      race == 8 ~ 'Asian',
+                      race == 9 ~ 'Mixed',
+                      TRUE ~ NA_character_ ),
+    
+    ed = case_when( ed == 0 ~ 'Less than 8th Grade',
+                    ed == 1 ~ '8th - 12th Grade - did not graduate',
+                    ed == 2 ~ 'HS graduate - no other schooling',
+                    ed == 3 ~ 'HS + trade',
+                    ed == 4 ~ 'HS + some College',
+                    ed == 5 ~ 'College graduate',
+                    ed %in% 6:7  ~ 'Trade school HS unclear',
+                    TRUE ~ NA_character_ ),
+    
+    drace = case_when(  drace %in% 0:5 ~ 'White',
+                        drace == 6 ~ 'Mex', 
+                        drace == 7 ~ 'Black',
+                        drace == 8 ~ 'Asian',
+                        drace == 9 ~ 'Mixed',
+                        TRUE ~ NA_character_ ),
+    
+    ded = case_when(  ded == 0 ~ 'Less than 8th Grade',
+                      ded == 1 ~ '8th - 12th Grade - did not graduate',
+                      ded == 2 ~ 'HS graduate - no other schooling',
+                      ded == 3 ~ 'HS + trade',
+                      ded == 4 ~ 'HS + some College',
+                      ded == 5 ~ 'College graduate',
+                      ded %in% 6:7  ~ 'Trade school HS unclear',
+                      TRUE ~ NA_character_ ),
+    
+    marital = case_when(  marital == 1 ~ 'Married',
+                          marital == 2 ~ 'Legally Separated', 
+                          marital == 3 ~ 'Divorced',
+                          marital == 4 ~ 'Widowed',
+                          marital == 5 ~ 'Never Married',
+                          TRUE ~ NA_character_ ),
+    
+    inc = case_when(  inc == 1 ~ 'Under 2500',
+                      inc == 2 ~ '2500 - 4999', 
+                      inc == 3 ~ '5000 - 7499',
+                      inc == 4 ~ '7500 - 9999',
+                      inc == 5 ~ '10000 - 12499', 
+                      inc == 6 ~ '12500 - 14999',
+                      inc == 7 ~ '15000 - 17499',
+                      inc == 8 ~ '17500 - 19999', 
+                      inc == 9 ~ '20000 and over',
+                      # 98 is unknown, 99 not asked ~ same thing?
+                      TRUE ~ NA_character_ ),
+    
+    smoke = case_when(  smoke == 0 ~ 'Never',
+                        smoke == 1 ~ 'Smokes now', 
+                        smoke == 2 ~ 'Until current pregnancy',
+                        smoke == 3 ~ 'Once did, not now',
+                        TRUE ~ NA_character_ ),
+    
+    time = case_when( time == 0 ~ 'Never smoked',
+                      time == 1 ~ 'Still smokes',
+                      time == 2 ~ 'During current pregnancy', 
+                      time == 3 ~ 'Within 1 year',
+                      time == 4 ~ '1 to 2 years ago',
+                      time == 5 ~ '2 to 3 years ago', 
+                      time == 6 ~ '3 to 4 years ago',
+                      time == 7 ~ '5 to 9 years ago',
+                      time == 8 ~ '10+ years ago', 
+                      time == 9 ~ 'Quit and dont know',
+                      # 98 is unknown, 99 not asked ~ same thing?
+                      TRUE ~ NA_character_ ),
+    
+    number = case_when( number == 0 ~ 'Never',
+                        number == 1 ~ '1-4',
+                        number == 2 ~ '5-9', 
+                        number == 3 ~ '10-14',
+                        number == 4 ~ '15-19',
+                        number == 5 ~ '20-29', 
+                        number == 6 ~ '30-39',
+                        number == 7 ~ '40-60',
+                        number == 8 ~ '60+', 
+                        number == 9 ~ 'Smoke but dont know',
+                        # 98 is unknown, 99 not asked ~ same thing?
+                        TRUE ~ NA_character_ ),
+    
+    newY_Groupedwt = case_when( wt <= 108.5 ~ 1,
+                                wt <= 120  ~ 2,
+                                wt <= 131 ~ 3,
+                                # 98 is unknown, 99 not asked ~ same thing?
+                                TRUE ~ 4 ),
+    
+    # lowe birth weight references;
+    # https://www.verywellfamily.com/baby-birth-weight-statistics-2633630
+    # https://www.babycentre.co.uk/a1033196/low-birth-weight-in-babies
+    lowBirthWeight = case_when( wt <= 88 ~ 'Yes',
+                                TRUE ~ 'No' )
+  ) %>%
+  # add m prefix to all columns associated with 'Mother' to clarify 
+  rename( 'mparity' = parity, 'mage' = age, 'mwt' = wt.1, 
+          'mht' = ht, 'mrace' = race, 'med' = ed, 
+          'msmoke' = smoke, 'mtime' = time, 'mnumber' = number ) %>%
   
-                    # remove msmoke due to collinearity with mtimes & mnumber
-                    # in addition we can remove other unrequired columns 
-                    select( -sex, -id, -pluralty, -outcome )
+  # remove msmoke due to collinearity with mtimes & mnumber
+  # in addition we can remove other unrequired columns 
+  select( -sex, -id, -pluralty, -outcome )
 
 
 # generalise all 999 unknown's to NA
@@ -160,15 +160,15 @@ team.clean.data[ unknown99 ] [ team.clean.data[ unknown99 ] == 99 ] <- NA
 # * Initial table summary of Low Birth Weight & baby weight differentials
 # *
 table.LowBirthWeights <-  team.clean.data %>%
-                          count( lowBirthWeight ) %>%
-                          ungroup() %>% 
-                          mutate( prop = round( prop.table( n ), digits = 2 ) )  %>% 
-                          bind_rows( group_by(.) %>%
-                                      summarise( n = sum( n ), prop = sum( prop ) ) %>%
-                                      mutate( lowBirthWeight ='Total' ) ) %>%  
-                          rename( 'Low Birth Weight' = lowBirthWeight,
-                                  'Number of Observations' = n,
-                                  'Proportion of Data Set (%)' = prop )
+  count( lowBirthWeight ) %>%
+  ungroup() %>% 
+  mutate( prop = round( prop.table( n ), digits = 2 ) )  %>% 
+  bind_rows( group_by(.) %>%
+               summarise( n = sum( n ), prop = sum( prop ) ) %>%
+               mutate( lowBirthWeight ='Total' ) ) %>%  
+  rename( 'Low Birth Weight' = lowBirthWeight,
+          'Number of Observations' = n,
+          'Proportion of Data Set (%)' = prop )
 
 # check out table
 kable( table.LowBirthWeights )
@@ -176,11 +176,11 @@ kable( table.LowBirthWeights )
 # lets have a look at the differentials of baby weights, coloured by low birth weight column
 hist.babyWeights <- ggplot( data = team.clean.data,
                             aes( x = wt, fill = lowBirthWeight ) ) +
-                    geom_bar() +
-                    ggtitle('Distribution of Baby Weights') +
-                    xlab('Range of Baby Weights') +
-                    ylab('Count of differences observed') +
-                    theme_light()
+  geom_bar() +
+  ggtitle('Distribution of Baby Weights') +
+  xlab('Range of Baby Weights') +
+  ylab('Count of differences observed') +
+  theme_light()
 
 # check out chart
 hist.babyWeights
@@ -207,14 +207,14 @@ mycolours <- c( 'Ambiguity Identified' = 'red', 'Clear Meaning' = 'grey50')
 # make final scatter plot
 scPlot.mSmokemTime <- ggplot( data = chart.msmoketime, 
                               aes( x = msmoke, y = mtime ) ) +
-                      geom_point( size = 3, 
-                                  aes( colour = highlight ) ) +
-                      scale_color_manual( 'Colour Key:', values = mycolours ) +
-                      ggtitle( 'Relationship between mSmoke and mTime variables in data set' ) +
-                      xlab( 'Mothers Smoking Status' ) +
-                      ylab( 'If the Mother quit smokng, how long ago' ) +
-                      theme( legend.position = 'none' ) +
-                      theme_light()
+  geom_point( size = 3, 
+              aes( colour = highlight ) ) +
+  scale_color_manual( 'Colour Key:', values = mycolours ) +
+  ggtitle( 'Relationship between mSmoke and mTime variables in data set' ) +
+  xlab( 'Mothers Smoking Status' ) +
+  ylab( 'If the Mother quit smokng, how long ago' ) +
+  theme( legend.position = 'none' ) +
+  theme_light()
 # check out chart
 scPlot.mSmokemTime
 
@@ -223,8 +223,8 @@ scPlot.mSmokemTime
 # * BASE DATA SET FOR MODELLING 
 # *
 base.model.dataset <- team.clean.data %>% 
-                      select( -newY_Groupedwt, -lowBirthWeight ) %>% 
-                      na.omit() 
+  select( -newY_Groupedwt, -lowBirthWeight ) %>% 
+  na.omit() 
 
 
 
@@ -418,7 +418,7 @@ alias( model3.AICStep )
 # mtime - easiest way to do that is to remove mtime from the data set provided
 # try another model removing mtime from dataset
 base.model.dataset.without.mtime <- base.model.dataset %>% 
-                                    select( -mtime )
+  select( -mtime )
 model3.lm.AICStep.without.mtime <- lm( wt ~ ., data = base.model.dataset.without.mtime )
 # calculate new best model, and what do we have here... AIC is now 3294.08 - lower than our previous best!...
 model3.AICStep.without.mtime <- step( model3.lm.AICStep.without.mtime )
@@ -455,7 +455,7 @@ alias( model3.AICStep )
 # mtime - easiest way to do that is to remove mtime from the data set provided
 # try another model removing mtime from dataset
 base.model.dataset.without.mtime <- base.model.dataset %>% 
-                                    select( -mtime )
+  select( -mtime )
 model3.lm.AICStep.without.mtime <- lm( wt ~ ., data = base.model.dataset.without.mtime )
 # calculate new best model, and what do we have here... AIC is now 3294.08 - lower than our previous best!...
 model3.AICStep.without.mtime <- step( model3.lm.AICStep.without.mtime )
@@ -512,7 +512,6 @@ crPlots(model3.lm.final)
 ceresPlots(model3.lm.final)
 
 # Assessing linearity 
-library(Epi)
 par(mfrow=c(3,2))
 termplot(model3.lm.final, se=T)
 termplot(model3.lm.final, se=T, partial.resid = T)
@@ -543,12 +542,11 @@ Graph_1 <- plot(model3.lm.final, Model.Resid, ylab = 'residuals', xlab = 'Baby W
 Graph_2 <- plot(model3.lm.final, which = 1:2)
 
 cut.fit <- cut(fitted(model3.lm.final), breaks = quantile(fitted(model3.lm.final),
-                                                        probs = c(seq(0,1,length=20))))
+                                                          probs = c(seq(0,1,length=20))))
 
 table(cut.fit)
 
 # plotting paris covariates
-library(GGally) 
 numericonly <- base.model.dataset %>% select_if(is.numeric)
 ggpairs(numericonly)
 # Running summary
@@ -558,7 +556,6 @@ confint(model3.lm.final)
 plot(confint(model3.lm.final))
 # demonstrating the confidence intervals graphically 
 # demonstrating the confidence intervals graphically 
-library(effects)
 effect.model <- base.model.dataset %>% 
   mutate(gestation= factor(gestation), mparity = factor(mparity), 
          drace= factor(drace), mnumber= factor(mnumber), mht= factor(mht),
@@ -617,27 +614,26 @@ Plot.mnumber <- ggplot(base.model.dataset) + geom_boxplot(aes(mnumber, wt), fill
 Plot.mnumber
 
 # Subject our best model to bootsrapping 
-library(boot)
 set.seed(180029290)
 par(mfrow = c(1,1))
 # something to store lots of regression coefficients 
 bootResults <- array(dim=c(1000, 17))
 for(i in 1:1000){
-# resample our data with replacement 
-regData <- data.frame(base.model.dataset)
-N <- nrow(regData)
-bootData <- regData[sample(1:N, size = N, replace = T),]
-# fit the model under this alternative reality 
-bootLM <- lm(formula = wt ~ gestation + mparity + mht + drace + dwt + mnumber, data = bootData)
-# store the coefs 
-#bootResults[i,] <- coef(bootLM)
-# store the coefs
-if(i == 1){
-  bootResults <- matrix(coef(bootLM), ncol = 17)
-} else {
-  bootResults <- rbind(bootResults, matrix(coef(bootLM), ncol = 17))
-}
-
+  # resample our data with replacement 
+  regData <- data.frame(base.model.dataset)
+  N <- nrow(regData)
+  bootData <- regData[sample(1:N, size = N, replace = T),]
+  # fit the model under this alternative reality 
+  bootLM <- lm(formula = wt ~ gestation + mparity + mht + drace + dwt + mnumber, data = bootData)
+  # store the coefs 
+  #bootResults[i,] <- coef(bootLM)
+  # store the coefs
+  if(i == 1){
+    bootResults <- matrix(coef(bootLM), ncol = 17)
+  } else {
+    bootResults <- rbind(bootResults, matrix(coef(bootLM), ncol = 17))
+  }
+  
 } 
 hist(bootResults[,1], col = "slateblue4", main = 'intercept distribution')
 hist(bootResults[,2:17], col = "slateblue4", main = 'slope distribution')
