@@ -386,3 +386,46 @@ plot(effect(term = "mparity", mod = altered.model))
 plot(effect(term = "dwt", mod = altered.model))
 plot(effect(term = "gestation", mod = altered.model))
 plot(effect(term = "mht", mod = altered.model))
+
+# First-order interaction between wt and gestation
+First.order.interaction1 <- lm( wt ~ gestation, data = base.model.dataset )                                            
+summary(First.order.interaction1)
+Anova(First.order.interaction1)
+plot(First.order.interaction1)
+ggplot(data = base.model.dataset) + geom_point(aes(x = gestation, y = wt), pch = 21, size = 4, 
+                                               fill = 'darkorange')
+# First-order interaction between wt and mht
+First.order.interaction2 <- lm( wt ~ mht, data = base.model.dataset )                                            
+summary(First.order.interaction2)
+Anova(First.order.interaction2)
+plot(First.order.interaction2)
+ggplot(data = base.model.dataset) + geom_point(aes(x = mht, y = wt), pch = 21, size = 4, 
+                                               fill = 'darkorange')
+
+# First-order interaction between wt and drace
+First.order.interaction3 <- lm( wt ~ drace, data = base.model.dataset )                                            
+summary(First.order.interaction3)
+Anova(First.order.interaction3)
+plot(First.order.interaction3)
+ggplot(data = base.model.dataset) + geom_point(aes(x = drace, y = wt), pch = 21, size = 4, 
+                                               fill = 'darkorange')
+Plot.drace <- ggplot(base.model.dataset) + geom_boxplot(aes(drace, wt), fill = 'purple', alpha = 0.8)
+
+# First-order interaction between wt and msomke
+First.order.interaction4 <- lm( wt ~ msmoke, data = base.model.dataset )                                            
+summary(First.order.interaction4)
+Anova(First.order.interaction4)
+plot(First.order.interaction4)
+ggplot(data = base.model.dataset) + geom_point(aes(x = msmoke, y = wt), pch = 21, size = 4, 
+                                               fill = 'darkorange')
+Plot.msmoke <- ggplot(base.model.dataset) + geom_boxplot(aes(msmoke, wt), fill = 'purple', alpha = 0.8)
+
+# First-order interaction between wt and mnumber
+First.order.interaction5 <- lm( wt ~ msmoke, data = base.model.dataset )                                            
+summary(First.order.interaction5)
+Anova(First.order.interaction5)
+plot(First.order.interaction5)
+ggplot(data = base.model.dataset) + geom_point(aes(x = mnumber, y = wt), pch = 21, size = 4, 
+                                               fill = 'darkorange')
+Plot.mnumber <- ggplot(base.model.dataset) + geom_boxplot(aes(mnumber, wt), fill = 'purple', alpha = 0.8)
+
