@@ -4,6 +4,10 @@ library( 'dplyr' )
 library( 'knitr' )
 library( 'ggplot2' )
 library( 'car' )
+library( 'Epi ')
+library( 'GGally' ) 
+library( 'effects' )
+library( 'boot' )
 
 
 # need to change this to one of our ID's...
@@ -198,6 +202,7 @@ Anova(new.p.Model.9)
 new.p.Model.10 <- update(new.p.Model.9, . ~ . -mrace)
 Anova(new.p.Model.8)
 
+# Date is not considered to be of interest as a covariate and is therefore removed
 new.p.Model.11 <- update(new.p.Model.10, . ~ . -date)
 Anova(new.p.Model.11)
 
@@ -207,13 +212,9 @@ Anova(new.p.Model.12)
 new.p.Model.13 <- update(new.p.Model.12, . ~ . -dwt)
 Anova(new.p.Model.13)
 
-# Date is not considered to be of interest as a covariate and is therefore removed
-
-
-
-# We now have a model following the p-value method which contains the 
-# gestation, mparity, mht, drace,, ded, dwt, mtime, mnumber
-p.value.model <- lm(wt ~ gestation + mparity + mht + drace  +  mnumber, data = lmModel.1)
+# We now have a model - following the p-value method - which contains the 
+# gestation, mparity, mht, drace, and mnumber covariates
+p.value.model <- lm(wt ~ gestation + mparity + mht + drace  +  mnumber, data = p.model.data)
 summary(p.value.model)
 plot(p.value.model)
 AIC(p.value.model)
@@ -410,6 +411,7 @@ plot(First.order.interaction3)
 ggplot(data = base.model.dataset) + geom_point(aes(x = drace, y = wt), pch = 21, size = 4, 
                                                fill = 'darkorange')
 Plot.drace <- ggplot(base.model.dataset) + geom_boxplot(aes(drace, wt), fill = 'purple', alpha = 0.8)
+Plot.drace
 
 # First-order interaction between wt and msomke
 First.order.interaction4 <- lm( wt ~ msmoke, data = base.model.dataset )                                            
@@ -428,9 +430,12 @@ plot(First.order.interaction5)
 ggplot(data = base.model.dataset) + geom_point(aes(x = mnumber, y = wt), pch = 21, size = 4, 
                                                fill = 'darkorange')
 Plot.mnumber <- ggplot(base.model.dataset) + geom_boxplot(aes(mnumber, wt), fill = 'purple', alpha = 0.8)
+Plot.mnumber
+
 # Subject our best model to bootsrapping 
 library(boot)
 set.seed(180029290)
+par(mfrow = c(1,1))
 # something to store lots of regression coefficients 
 bootResults <- array(dim=c(1000, 17))
 for(i in 1:1000){
