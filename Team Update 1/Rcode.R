@@ -130,7 +130,7 @@ team.clean.data <-  team.data %>%
     lowBirthWeight = case_when( wt <= 88 ~ 'Yes',
                                 TRUE ~ 'No' ),
     
-    mumEverSmoked = case_when( time == 'No',
+    mumEverSmoked = case_when( time == 'Never smoked' ~ 'No',
                                TRUE ~ 'Yes' )
     
   ) %>%
@@ -231,9 +231,19 @@ base.model.dataset <- team.clean.data %>%
   na.omit() 
 
 
+# 1st Order Interactions - priori logical
+# Common thoughts are if Mother has ever smoked, and gave birth early we would assume the babies weight would be lower 
+# than average
+# first clean data set to ensure mEverSmoke is included in data
+interactions.model.dataset <- team.clean.data %>% 
+                              select( -newY_Groupedwt, -lowBirthWeight ) %>% 
+                              na.omit() 
+
+# generate 1st Order Interactions
+intaraction.priori.logical <- lm( wt ~ mumEverSmoked:gestation, 
+                                  data = interactions.model.dataset )
 
 # *
-
 #  backwards p-value method  -------------------------------------------------
 
 p.model.data <- base.model.dataset
@@ -535,15 +545,17 @@ k <- 5
 train.percentage <- 0.8
 
 # utilise modelAppraisal function to generate AIC, BIC & k-fold Cross Validation results
-model1.Appraisal <- function.ModelAppraisal( p.value.model, 'Model 1 - pvalues', train.percentage, k )
-model2.Appraisal <- function.ModelAppraisal( R.final.full.model, 'Model 2 - Adjusted Rsquared', train.percentage, k ) 
-model3.Appraisal <- function.ModelAppraisal( model3.final, 'Model 3 - AIC', train.percentage, k ) 
+model1.Appraisal <- function.ModelAppraisal( intaraction.priori.logical, 'Model 1 - Priori Logical', train.percentage, k )
+model2.Appraisal <- function.ModelAppraisal( p.value.model, 'Model 2 - pvalues', train.percentage, k )
+model3.Appraisal <- function.ModelAppraisal( R.final.full.model, 'Model 3 - Adjusted Rsquared', train.percentage, k ) 
+model4.Appraisal <- function.ModelAppraisal( model3.final, 'Model 4 - AIC', train.percentage, k )
+
 # ****
 # **** to add any more comparisons, simply copy and paste the above line and then add it to the rbind() step below
 # ****
 
 # using appraisals above, create one full table
-fullmodel.AppraisalTable <- rbind( model1.Appraisal, model2.Appraisal, model3.Appraisal )
+fullmodel.AppraisalTable <- rbind( model1.Appraisal, model2.Appraisal, model3.Appraisal, model4.Appraisal )
 
 # View results in Table
 kable( fullmodel.AppraisalTable )
