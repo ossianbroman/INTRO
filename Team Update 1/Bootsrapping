@@ -1,0 +1,94 @@
+##  convince yourself the two lines above are equivalent to
+resample <- base.model.dataset[sample(1:dim(base.model.dataset)[1], replace = TRUE), ]
+
+#fit the original model
+model <- lm(wt ~ mnumber + dwt + mparity + drace + mht + gestation, data = base.model.dataset )
+#save predictions and residuals
+pred <- predict(model)
+resid <- resid(model)
+
+
+#refit the model
+new.model <- lm(resample.wt ~ mnumber + dwt + mparity + drace + mht + gestation, data = base.model.dataset)
+
+
+bootstrap.fn <- function(lm.object, residualBS = F, 
+                         B = 99, alpha = 0.05, normtest = F, printit = F) {
+  #
+  #  Purpose: Perform confidence interval calculation for
+  #           parameters of a simple linear regression using
+  #           non-parametric bootstrap based either on percentile or residual methods
+  #           optional diagnostics include normality tests of replicate estimates
+  #
+  #  Input: lm.object - Object created by regression function lm()
+  #         residualBS - whether to perform bootstrap with residuals (if TRUE),
+  #                      if FALSE, "regular" bootstrap is performed
+  #         B - number of bootstrap replicates
+  #         alpha - Type I error rate
+  #         normtest - should normality tests of bootstrap estimates be performed
+  #         printit - printed output as well as returned matrix
+  #
+  #  Output:  2x2 matrix of lower/upper bounds (columns) for intercept and slope (rows)
+  #           vector of diagnostics for inadmissible residual bootstraps responses
+  #           possibly shapiro normality tests and qq plots
+  #
+  if (class(lm.object) != "lm") stop("First argument is not an lm object")
+  if (B <= 3) stop("Need to run 3 or more bootstrap replicates")
+  param.name <- c("Intercept", "Slope")
+  n.obs <- dim(lm.object$model)[1]
+  boot.coef <- matrix(NA, nrow = B + 1, ncol = 17)
+  ci.bounds <- matrix(NA, nrow = B, ncol = 17)
+  n.lt.0 <- 0
+  n.gt.100 <- 0
+  n.both <- 0
+  if (residualBS) {
+    pred <- predict(lm.object)
+    resid <- resid(lm.object)
+    for (i in 1:B){
+      resample.index <- sample(1:n.obs, n.obs, replace=TRUE)
+      resample <- pred + resid[resample.index]
+      resid.resample <- as.data.frame(cbind(resample, model$model[,2]))
+      #         compute the proportion of inadmissable values
+      if(any(resample < 0)) n.lt.0 <- n.lt.0 + 1
+      if(any(resample > 100)) n.gt.100 <- n.gt.100 + 1
+      if(any((resample < 0) | (resample > 100))) n.both <- n.both + 1
+      new.model <- lm(resample ~ V2, data = resid.resample)
+      boot.coef[i,] <- coef(new.model)
+    }
+  } else {
+    for (i in 1:B) {
+      resample.index <- sample(1:n.obs, n.obs,replace = TRUE)
+      resample <- lm.object$model[resample.index, ]
+      new.model <- lm(as.formula(lm.object$terms), data = resample)
+      boot.coef[i,] <- coef(new.model)
+    }
+  }
+  boot.coef[B+1,] <- coef(lm.object)
+  is.residual <- ifelse(residualBS, "residual", "")
+  for(i in 1:2){
+    ci.bounds[i, ] <- round(quantile(boot.coef[,i],
+                                     probs=c(alpha / 2, (1 - alpha / 2))), 6)
+    if (printit) print(paste("bootstrap", is.residual,
+                             "confidence interval for parameter",
+                             param.name[i], "is", ci.bounds[i, 1], "to", ci.bounds[i, 2]))
+  }
+  if (normtest) {
+    par(mfrow = c(1, 2))
+    for(i in 1:2){
+      #Shapiro complains if you try more than 5000 samples
+      B.shapiro <- min(B, 5000)
+      print(paste("Normality test of", param.name[i]))
+      print(shapiro.test(boot.coef[1:B.shapiro,i]))
+      qqnorm(boot.coef[,i],main = paste("Distribution of", param.name[i]))
+      qqline(boot.coef[,i])
+    }
+  }
+  return(list(ci.bounds = ci.bounds, resid.inadmissable = round(c(n.lt.0, n.gt.100, n.both) / B,3 )))
+}
+
+
+length(coef( model ))
+
+regular.boot <- bootstrap.fn(model, B = 999)
+print(paste("Regular bootstrap CI for intercept", regular.boot$ci.bounds[1, 1],
+            "to", regular.boot$ci.bounds[1, 2]))
