@@ -128,7 +128,11 @@ team.clean.data <-  team.data %>%
     # https://www.verywellfamily.com/baby-birth-weight-statistics-2633630
     # https://www.babycentre.co.uk/a1033196/low-birth-weight-in-babies
     lowBirthWeight = case_when( wt <= 88 ~ 'Yes',
-                                TRUE ~ 'No' )
+                                TRUE ~ 'No' ),
+    
+    mumEverSmoked = case_when( time == 'No',
+                               TRUE ~ 'Yes' )
+    
   ) %>%
   # add m prefix to all columns associated with 'Mother' to clarify 
   rename( 'mparity' = parity, 'mage' = age, 'mwt' = wt.1, 
@@ -223,7 +227,7 @@ scPlot.mSmokemTime
 # * BASE DATA SET FOR MODELLING 
 # *
 base.model.dataset <- team.clean.data %>% 
-  select( -newY_Groupedwt, -lowBirthWeight ) %>% 
+  select( -newY_Groupedwt, -lowBirthWeight, -mumEverSmoked ) %>% 
   na.omit() 
 
 
