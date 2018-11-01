@@ -603,8 +603,8 @@ ld.variables <- attributes(alias(model3.lm.comparisonStuff)$Complete)$dimnames[[
 model3.lm.final <- lm( wt ~ mnumber + dwt + mparity + drace + mht + gestation, data = base.model.dataset ) 
 model3.final <- step( model3.lm.final )
 
-# Returnining an AIC value of 5003.591
-AIC( model3.final )
+# Returning an AIC value of 5003.591
+AIC(model3.lm.final)
 # Evaluate Collinearity using variance inflation factors 
 vif(model3.lm.final)
 alias(model3.lm.final)
@@ -636,7 +636,6 @@ crPlots(model3.lm.final)
 ceresPlots(model3.lm.final)
 
 # Assessing linearity 
-par(mfrow=c(3,2))
 termplot(model3.lm.final, se=T)
 termplot(model3.lm.final, se=T, partial.resid = T)
 
@@ -646,7 +645,6 @@ termplot(model3.lm.final, se=T, partial.resid = T)
 ncvTest(model3.lm.final)
 # Plots residuals against ˆ y and the x
 Model.Resid <- resid(model3.lm.final)
-par(mfrow=c(3,2))
 plot(base.model.dataset$wt, Model.Resid, ylab = 'residuals', xlab = 'Mother Weight')
 plot(base.model.dataset$mage, Model.Resid, ylab = 'residuals', xlab = 'Mother Age')
 plot(fitted(model3.lm.final), Model.Resid, ylab = 'residuals', xlab = 'Fitted values')
