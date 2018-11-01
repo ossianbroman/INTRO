@@ -285,7 +285,7 @@ summary(p.value.model)
 plot(p.value.model)
 AIC(p.value.model)
 
-# R squared ---------------------------------------------------------------
+# adjusted R-squared ---------------------------------------------------------------
 
 # model with all varibales - adjusted R squared = 0.29
 R.model.test <- base.model.dataset  
@@ -302,103 +302,106 @@ R2.model.test <- base.model.dataset %>% select (-mage, -dage)
 R2.full.model <- lm( wt ~ ., data = R2.model.test )
 summary(R2.full.model)
 
-# model with additional removal of inc - adjusted R squared = 0.2968
-R3.model.test <- base.model.dataset  %>% select (-inc, -dage) 
+# model with additional removal of inc - adjusted R squared = 0.2981
+R3.model.test <- base.model.dataset  %>% select (-inc, -mage, -dage) 
 R3.full.model <- lm( wt ~ ., data = R3.model.test )
 summary(R3.full.model)
 
-# model with additional removal of dht - adjusted R squared = 0.2977
-R4.model.test <- base.model.dataset %>% select (-dht, -inc, -dage)
+# model with additional removal of dht - adjusted R squared = 0.2989
+R4.model.test <- base.model.dataset %>% select (-dht, -inc,-mage, -dage)
 R4.full.model <- lm( wt ~ ., data = R4.model.test )
 summary(R4.full.model)
 
-# model with additional removal of mrace - adjusted R squared = 0.2984
-R5.model.test <- base.model.dataset  %>% select (-mrace, -dht, -inc, -dage)
+# model with additional removal of mrace - adjusted R squared = 0.2996
+R5.model.test <- base.model.dataset  %>% select (-mrace, -dht, -inc, -mage, -dage)
 R5.full.model <- lm( wt ~ ., data = R5.model.test )
 summary(R5.full.model)
 
-# model with additional removal of marital - adjusted R squared = 0.3016
-R6.model.test <- base.model.dataset  %>% select (-marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of marital - adjusted R squared = 0.3028
+R6.model.test <- base.model.dataset  %>% select (-marital, -mrace, -dht, -inc, -mage, -dage)
 R6.full.model <- lm( wt ~ ., data = R6.model.test )
 summary(R6.full.model)
 
-# model with additional removal of mwt - adjusted R squared = 0.3022
-R7.model.test <- base.model.dataset  %>% select (-mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of mwt - adjusted R squared = 0.3035
+R7.model.test <- base.model.dataset  %>% select (-mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R7.full.model <- lm( wt ~ ., data = R7.model.test )
 summary(R7.full.model)
 
-# model with additional removal of med - adjusted R squared = 0.3042
-R8.model.test <- base.model.dataset %>% select (-med, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of med - adjusted R squared = 0.3053
+R8.model.test <- base.model.dataset %>% select (-med, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R8.full.model <- lm( wt ~ ., data = R8.model.test )
 summary(R8.full.model)
 
-# model with additional removal of date - adjusted R squared = 0.301
-R9.model.test <- base.model.dataset  %>% select (-date, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of date - adjusted R squared = 0.3022
+R9.model.test <- base.model.dataset  %>% select (-date, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R9.full.model <- lm( wt ~ ., data = R9.model.test )
 summary(R9.full.model)
 #adjusted R squared not higher - leave date in model
 
-# model with additional removal of mtime - adjusted R squared = 0.3014
-R10.model.test <- base.model.dataset  %>% select (-mtime, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of mtime - adjusted R squared = 0.3027
+R10.model.test <- base.model.dataset  %>% select (-mtime, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R10.full.model <- lm( wt ~ ., data = R10.model.test )
 summary(R10.full.model)
 #adjusted R squared not higher - leave mtime in model
 
-# model with additional removal of drace - adjusted R squared = 0.2992
-R11.model.test <- base.model.dataset  %>% select (-drace, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of drace - adjusted R squared = 0.2816
+R11.model.test <- base.model.dataset  %>% select (-drace, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R11.full.model <- lm( wt ~ ., data = R11.model.test )
 summary(R11.full.model)
 # adjusted R squared not higher - leave drace in model
 
-# model with additional removal of mnumber - adjusted R squared = 0.2927
-R12.model.test <- base.model.dataset  %>% select (-mht, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of mnumber - adjusted R squared = 0.2764
+R12.model.test <- base.model.dataset  %>% select (-mht, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R12.full.model <- lm( wt ~ ., data = R12.model.test )
 summary(R12.full.model)
 # adjusted R squared not higher - leave mnumber in model
 
-# model with additional removal of msmoke - adjusted R squared = 0.3022
-R13.model.test <- base.model.dataset  %>% select (-msmoke, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of msmoke - adjusted R squared = 0.3035
+R13.model.test <- base.model.dataset  %>% select (-msmoke, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R13.full.model <- lm( wt ~ ., data = R13.model.test )
 summary(R13.full.model)
 # adjusted R squared not highest - leave msmoke in model
 
-# model with additional removal of dwt - adjusted R squared = 0.3022
-R14.model.test <- base.model.dataset  %>% select (-dwt, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of dwt - adjusted R squared = 0.3000
+R14.model.test <- base.model.dataset  %>% select (-dwt, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R14.full.model <- lm( wt ~ ., data = R14.model.test )
 summary(R14.full.model)
 # adjusted R squared not highest - leave dwt in model
 
-# model with additional removal of ded - adjusted R squared = 0.2992
-R15.model.test <- base.model.dataset %>% select (-ded, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of ded - adjusted R squared = 0.3004
+R15.model.test <- base.model.dataset %>% select (-ded, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R15.full.model <- lm( wt ~ ., data = R15.model.test )
 summary(R15.full.model)
 # adjusted R squared not highest - leave ded in model
 
-# model with additional removal of mht - adjusted R squared = 0.2751
-R16.model.test <- base.model.dataset %>% select (-mht, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of mht - adjusted R squared = 0.2764
+R16.model.test <- base.model.dataset %>% select (-mht, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R16.full.model <- lm( wt ~ ., data = R16.model.test )
 summary(R16.full.model)
 # adjusted R squared not highest - leave mht in model
 
-# model with additional removal of mparity - adjusted R squared = 0.2966
-R17.model.test <- base.model.dataset %>% select (-mparity, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of mparity - adjusted R squared = 0.2952
+R17.model.test <- base.model.dataset %>% select (-mparity, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R17.full.model <- lm( wt ~ ., data = R17.model.test )
 summary(R17.full.model)
 # adjusted R squared not highest - leave mparity in model
 
-# model with additional removal of gestation - adjusted R squared = 0.1619
-R18.model.test <- base.model.dataset %>% select (-gestation, -mwt, -marital, -mrace, -dht, -inc, -dage)
+# model with additional removal of gestation - adjusted R squared = 0.1633
+R18.model.test <- base.model.dataset %>% select (-gestation, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R18.full.model <- lm( wt ~ ., data = R18.model.test )
 summary(R18.full.model)
 # adjusted R squared not highest - leave gestation in model
 
 # Therefore using adjusted R squared the best linear model is
-R.final.model.test <- base.model.dataset  %>% select (-med, -mwt, -marital, -mrace, -dht, -inc, -dage)
+R.final.model.test <- base.model.dataset  %>% select (-med, -mwt, -marital, -mrace, -dht, -inc, -mage, -dage)
 R.final.full.model <- lm( wt ~ ., data = R.final.model.test )
 summary(R.final.full.model)
-# Removing the following variables med, mwt, marital, mrace, dht, inc, dage, sex, id, outcome, pluralty
+# Removing the following variables med, mwt, marital, mrace, dht, inc, mage, dage, sex, id, outcome, pluralty
 
-# Final model includes; date, gestation, mparity, mage, mht, drace, ded, dwt, msmoke, mtime, mnumber - adjusted R squared is 0.3042
+# Final model includes; gestation, mparity, mht, drace, ded, dwt,mnumber - adjusted R squared is 0.3053
+# variable date has been removed as it is of no interest
+# mtime and msmoke have been removed as collinear with mnumber
+
 
 # AIC ---------------------------------------------------------------------
 
