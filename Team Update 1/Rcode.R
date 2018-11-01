@@ -405,7 +405,6 @@ summary(R.final.full.model)
 
 # AIC ---------------------------------------------------------------------
 
-
 # * INITIAL MODEL SELECTION ~ AIC Stepwise 
 # *
 # with our base model dataset
@@ -445,7 +444,113 @@ model3.final <- step( model3.lm.final )
 # returnining an AIC value of 5003.591
 AIC( model3.final )
 
+# *
+# * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# * Selecting Optimum Model
+# * AIC, BIC, K-Folds Cross Validation
 
+# *
+# * Custom function to appraise models we have built for this assignment
+# * simply pass in linear model, a name to reference that model, the train
+# * percentage of dataset to use and number of k-fold validaton to process
+# *
+# * Function returns single row of results for AIC, BIX & k-fold validation outputs
+# *
+function.ModelAppraisal <- function( lm.model, model.name, 
+                                     train.percentage, k ){
+  
+  # load required libraries
+  library( 'dplyr' )
+  library( 'car' )
+  library( 'lattice' )
+  library( 'caret' )
+  
+  # set seed to ensure results can be replicated
+  set.seed(123)
+  
+  # extract model data set to use
+  kcv.dataset <- model.frame( lm.model )
+  # now we are going to re-construct the model formula used
+  dataColumns <- as.vector( names( kcv.dataset ) )
+  ref.xCovariates <- length( dataColumns )
+  func.xCovariates <- dataColumns[ 2:ref.xCovariates ]
+  func.Y <- dataColumns[ 1 ]
+  # generate linear function to use
+  func.LinearModel <- as.formula( paste( func.Y, paste( func.xCovariates,
+                                                        collapse = '+' ), 
+                                         sep = '~' ) )
+  
+  # lets create splits/partitions of train and test
+  kcv.split <- createDataPartition( y = kcv.dataset[, func.Y], 
+                                    p = train.percentage, list = FALSE )
+  # train
+  kcv.train <- kcv.dataset[ kcv.split, ]
+  # test
+  kcv.test <- kcv.dataset[ -kcv.split, ]
+  
+  kcv.type <- paste( 'k = ', k, sep = '' )
+  
+  # run cross validation on entire dataset to gauge results
+  kcv.TrainModel <- train(  func.LinearModel,
+                            kcv.train,
+                            method = 'lm',
+                            trControl = trainControl( method = 'cv', 
+                                                      number = 5,
+                                                      verboseIter = T ) )
+  
+  # now preduct values with trained model
+  kcv.TrainPredictions <- predict( kcv.TrainModel, kcv.test )
+  
+  # create a data frame of predications vs actual test results
+  kcv.Predictions <- data.frame( obs = kcv.test[, func.Y], 
+                                 pred = kcv.TrainPredictions )
+  
+  # show how effective model is
+  aic.Results <- round( AIC( lm.model ), digits = 2 )
+  bic.Results <- round( BIC( lm.model ), digits = 2 )
+  # to use test/predicton results adjust comments accordingly
+  #kcv.Results <- round( defaultSummary( kcv.Predictions ), digits = 2 )
+  # to use the train results adjust comments accordingly
+  kc.TrainResults <- kcv.TrainModel$results[2:4]
+  kcv.Results <- round( as.vector( kc.TrainResults ), digits = 2 )
+  
+  # generate full appraisal data set
+  model.appraisal <-  as.data.frame( cbind( Model = model.name, AIC = aic.Results, BIC = bic.Results, 
+                                            Type = kcv.type, 
+                                            RMSE = kcv.Results[1], Rsquared = kcv.Results[2], MAE = kcv.Results[3] ) ) %>%
+    rename( 'Cross Validation (CV) Type' = Type,
+            'CV - RMSE' = RMSE, 
+            'CV - Rsquared' = Rsquared,
+            'CV - MAE' = MAE )
+  # return model appraisal to user
+  return( model.appraisal )
+}
+
+# set global variables to support model appraisal
+k <- 5
+train.percentage <- 0.8
+
+# utilise modelAppraisal function to generate AIC, BIC & k-fold Cross Validation results
+model1.Appraisal <- function.ModelAppraisal( p.value.model, 'Model 1 - pvalues', train.percentage, k )
+model2.Appraisal <- function.ModelAppraisal( R.final.full.model, 'Model 2 - Adjusted Rsquared', train.percentage, k ) 
+model3.Appraisal <- function.ModelAppraisal( model3.final, 'Model 3 - AIC', train.percentage, k ) 
+# ****
+# **** to add any more comparisons, simply copy and paste the above line and then add it to the rbind() step below
+# ****
+
+# using appraisals above, create one full table
+fullmodel.AppraisalTable <- rbind( model1.Appraisal, model2.Appraisal, model3.Appraisal )
+
+# View results in Table
+kable( fullmodel.AppraisalTable )
+
+# **** can you guys please double check these results, even when I manually run BIC( p.value.model ) I get a lower BIC result 
+# **** compared to running BIC( model3.final ) 
+
+
+# *
+# * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# * Model Assumption Checks
 
 # FARZAM - to put in assumtions code and bootstrap
 # check model for collinearity - proves atleast one exists
