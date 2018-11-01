@@ -737,32 +737,113 @@ ggplot(data = base.model.dataset) + geom_point(aes(x = mnumber, y = wt), pch = 2
 Plot.mnumber <- ggplot(base.model.dataset) + geom_boxplot(aes(mnumber, wt), fill = 'purple', alpha = 0.8)
 Plot.mnumber
 
-# Subject our best model to bootsrapping 
-set.seed(180029290)
-par(mfrow = c(1,1))
-# something to store lots of regression coefficients 
-bootResults <- array(dim=c(1000, 17))
-for(i in 1:1000){
-  # resample our data with replacement 
-  regData <- data.frame(base.model.dataset)
-  N <- nrow(regData)
-  bootData <- regData[sample(1:N, size = N, replace = T),]
-  # fit the model under this alternative reality 
-  bootLM <- lm(formula = wt ~ gestation + mparity + mht + drace + dwt + mnumber, data = bootData)
-  # store the coefs 
-  #bootResults[i,] <- coef(bootLM)
-  # store the coefs
-  if(i == 1){
-    bootResults <- matrix(coef(bootLM), ncol = 17)
-  } else {
-    bootResults <- rbind(bootResults, matrix(coef(bootLM), ncol = 17))
-  }
-  
-} 
-hist(bootResults[,1], col = "slateblue4", main = 'intercept distribution')
-hist(bootResults[,2:17], col = "slateblue4", main = 'slope distribution')
+# Percentile confidence intervals from a nonparametric bootstrap
 
-# Best guesses of parameters 
-c(mean(bootResults[,1]), mean(bootResults[,2])) 
-# the CIs for these 
-rbind(quantile(bootResults[,1], probs = c(0.025, 0.975)), quantile(bootResults[,2], probs = c(0.025, 0.975)))
+# Setting the seed
+set.seed(123)
+
+# Fitting the original model
+model <- lm( wt ~ mnumber + dwt + mparity + drace + mht + gestation, 
+             
+             data = base.model.dataset )
+# Viewing dataset
+View( base.model.dataset )
+
+# Assigning predictions and residuals
+pred <- predict(model)
+resid <- resid(model)
+
+lm.object <- model
+B = 10
+alpha = 0.05
+i = 1
+as.formula(lm.object$terms)
+lm(as.formula(lm.object$terms), data = resample )
+
+bootstrap.fn <- function(lm.object, B = 10, alpha = 0.05 ){
+
+# Purpose: Performing confidence interval calculation for
+#           parameters of our best linear regression model using
+#           non-parametric bootstrap based either on percentile
+#       
+# Input:  lm.object - Object created by regression function lm()
+#         residualBS
+#         B represents number of bootstrap replicates
+#         alpha - Type I error rate
+# Output: A 2*17 matrix of lower/upper bounds (columns) for intercept and slope (rows)
+#         vector of diagnostics for inadmissible residual bootstraps responses and qq plots 
+
+set.seed( 123 )
+param.name <- c("Intercept", "Slope")
+n.obs <- nrow( lm.object$model )
+
+# Setting matrix that contains the bootstrap coefficients
+boot.coef <- matrix(NA, nrow = B + 1, ncol = 17)
+number.coefs <- matrix(17, nrow = B, ncol = 1)
+ci.bounds <- matrix(NA, nrow = 17, ncol = 2)
+
+# Conducting the bootstrap
+for (i in 1:B){
+    
+resample.index <- sample( 1:n.obs, n.obs, replace = TRUE )
+    
+resample <- lm.object$model[ resample.index, ]
+
+# Refitting the model   
+new.model <- lm( as.formula( lm.object$terms ), data = resample )
+
+# Extracting the parameter estimates    
+num.coefs <- length( coef( new.model ) )
+    
+if( num.coefs == 17 ){ 
+      
+# Extracting the parameter estimates
+boot.coef[i,] <- coef(new.model) 
+      
+} else { number.coefs[i,] <- num.coefs   }
+}
+# Adding the original parameter estimates 
+boot.coef[ B+1,] <- coef(lm.object)
+  
+new.boot.coef <- boot.coef[ !rowSums( !is.finite( boot.coef ) ), ]
+  
+actual.bootscompleted <- nrow( new.boot.coef )
+
+# calculating confidence intervals 
+for(i in 1:17) {
+ci.bounds[i, ] <- round(quantile(new.boot.coef[,i], 
+                                 probs =c( alpha / 2, ( 1 - alpha / 2 ) ) ), digits = 6 )
+    
+}
+  
+return(list( ci.bounds = ci.bounds, 
+                
+                boot = boot.coef,
+                
+                refinedboot = new.boot.coef,
+                
+                numberofBootscompleted = actual.bootscompleted,
+                
+                coefs = number.coefs ) )
+  
+}
+
+# lenght of our best model
+length(coef(new.model))
+
+# Showing the confidence intervals of bootstrap
+regular.boot <- bootstrap.fn(model, B = 999 )
+regular.boot$ci.bounds
+
+# Printing the confidence intervals of our best model
+confint(model)
+coef(new.model)
+
+# Regular bootstrap CI for intercept
+print(paste("Regular bootstrap CI for intercept", regular.boot$ci.bounds[1, 1],
+            "to", regular.boot$ci.bounds[1, 2]))
+# Regular bootstrap CI for slope
+print(paste("Regular bootstrap CI for slope", regular.boot$ci.bounds[2, 1],
+            "to", regular.boot$ci.bounds[2, 2]))
+
+
