@@ -281,9 +281,9 @@ Anova(new.p.Model.13)
 # We now have a model - following the p-value method - which contains the 
 # gestation, mparity, mht, drace, and mnumber covariates
 p.value.model <- lm(wt ~ gestation + mparity + mht + drace  +  mnumber, data = p.model.data)
-summary(p.value.model)
-plot(p.value.model)
-AIC(p.value.model)
+# summary(p.value.model)
+#plot(p.value.model)
+#AIC(p.value.model)
 
 # adjusted R-squared ---------------------------------------------------------------
 
