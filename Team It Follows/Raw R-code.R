@@ -566,7 +566,7 @@ kable( fullmodel.AppraisalTable )
 # * ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # * Model Assumption Checks
 
-# FARZAM - to put in assumtions code and bootstrap
+
 # check model for collinearity - proves atleast one exists
 vif( model3.AICStep )
 # confirm which variables are collinear - mtime and mnumber
