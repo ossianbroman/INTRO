@@ -634,8 +634,11 @@ crPlots(model3.lm.final)
 ceresPlots(model3.lm.final)
 
 # Assessing linearity 
-termplot(model3.lm.final, se=T)
-termplot(model3.lm.final, se=T, partial.resid = T)
+termplot(lm(wt ~ gestation + mparity + drace + mht + dwt + mnumber, 
+            data = base.model.dataset, se=T))
+
+termplot(lm(wt ~ gestation + mparity + drace + mht + dwt + mnumber, 
+            data = base.model.dataset, se=T, partial.resid = T))
 
 # Spread: 
 # Checking variance of residuals (variance of the error distribution) is constant WRT ˆ y and the x 
@@ -658,8 +661,7 @@ ncvTest(model3.lm.final, wt ~ .)
 # Plots residuals against ˆ y and the x 
 # Testing with Durbin-Watson (H0 the errors are uncorrelated)
 durbinWatsonTest(model3.lm.final)
-Graph_1 <- plot(model3.lm.final, Model.Resid, ylab = 'residuals', xlab = 'Baby Weight')
-Graph_2 <- plot(model3.lm.final, which = 1:2)
+Graph_1 <- plot(model3.lm.final, which = 1:2)
 
 cut.fit <- cut(fitted(model3.lm.final), breaks = quantile(fitted(model3.lm.final),
                                                           probs = c(seq(0,1,length=20))))
