@@ -9,12 +9,9 @@ library( 'GGally' )
 library( 'effects' )
 library( 'boot' )
 
-
-# need to change this to one of our ID's...
-# ensures when we take a random 80% sample for training and 20% for testing 
+# set.seed ensures when we take a random 80% sample for training and 20% for testing 
 # of model that we get the same results
 set.seed(123)
-#set.seed(99999)
 
 # options for setting directories
 setwd("D:/sbr_Development/MSc/Semester 1/MT5762/Assignments/#2")	
