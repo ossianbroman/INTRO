@@ -14,6 +14,7 @@ library( 'boot' )
 set.seed(123)
 
 # options for setting directories
+# adjust working directory to suit user.
 setwd("D:/sbr_Development/MSc/Semester 1/MT5762/Assignments/#2")	
 
 
