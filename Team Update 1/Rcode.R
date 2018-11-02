@@ -742,19 +742,16 @@ model <- lm( wt ~ mnumber + dwt + mparity + drace + mht + gestation,
              
              data = base.model.dataset )
 # Viewing dataset
-View( base.model.dataset )
+#View( base.model.dataset )
 
 # Assigning predictions and residuals
 pred <- predict(model)
 resid <- resid(model)
 
-lm.object <- model
-B = 10
-alpha = 0.05
-i = 1
-as.formula(lm.object$terms)
-lm(as.formula(lm.object$terms), data = resample )
-
+# * 
+# * Extension of bootstrap function to return confidence intervals for 'best' model 
+# * which contains 16 coefficients and intercept
+# *
 bootstrap.fn <- function(lm.object, B = 10, alpha = 0.05 ){
 
 # Purpose: Performing confidence interval calculation for
