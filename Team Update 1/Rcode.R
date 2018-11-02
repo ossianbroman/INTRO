@@ -826,16 +826,9 @@ return(list( ci.bounds = ci.bounds,
   
 }
 
-# lenght of our best model
-length(coef(new.model))
-
 # Showing the confidence intervals of bootstrap
 regular.boot <- bootstrap.fn(model, B = 999 )
 regular.boot$ci.bounds
-
-# Printing the confidence intervals of our best model
-confint(model)
-coef(new.model)
 
 # Regular bootstrap CI for intercept
 print(paste("Regular bootstrap CI for intercept", regular.boot$ci.bounds[1, 1],
