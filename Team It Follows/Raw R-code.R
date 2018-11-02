@@ -634,10 +634,12 @@ crPlots(model3.lm.final)
 ceresPlots(model3.lm.final)
 
 # Assessing linearity 
-termplot(lm(wt ~ gestation + mparity + drace + mht + dwt + mnumber, 
+termplot(lm(wt ~ gestation + mparity + mht + dwt + mnumber + drace, 
             data = base.model.dataset, se=T))
 
-termplot(lm(wt ~ gestation + mparity + drace + mht + dwt + mnumber, 
+
+
+termplot(lm(wt ~ gestation + mparity + mht + dwt + mnumber + drace, 
             data = base.model.dataset, se=T, partial.resid = T))
 
 # Spread: 
